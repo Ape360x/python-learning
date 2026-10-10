@@ -1,0 +1,9 @@
+{
+  "status": "success",
+  "students": [
+    {"name": "Ada", "score": 78},
+    {"name": "Bola", "score": 91},
+    {"name": "Chidi", "score": 64},
+    {"name": "Dayo", "score": 88}
+  ]
+}
