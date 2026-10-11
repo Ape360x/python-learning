@@ -51,8 +51,23 @@ function two or three fake dicts and run it — that caught the bug below in sec
 - test failure branches deliberately (fake username → 404, fake domain →
   ConnectionError, `timeout=0.001` → Timeout) instead of waiting for real breakage
 
-**Next session starts at:** Git and GitHub — version control, and pushing this
-project up in public.
+- use **Git** — `init`, `status`, `add`, `commit`, `diff`, `remote`, `push`
+- write a `.gitignore` **before** the first commit (1,006 `.venv` files kept out)
+- understand local vs remote, and `origin` as the remote's nickname
+
+**Live repository:** https://github.com/Ape360x/python-learning
+
+- keep secrets out of code with **environment variables** — `.env` + `python-dotenv`,
+  with `.env` in `.gitignore` and a committed `.env.example` as documentation
+- make an **LLM API call** — `requests.post()`, `Authorization: Bearer` headers, a
+  JSON body, and reading the reply from `data["choices"][0]["message"]["content"]`
+- read and write **list comprehensions** — `[m["id"] for m in data]`
+- wrap an API call in a reusable **`ask(prompt)`** function that returns the text
+
+**Next session starts at:** the first real automation — read `data.json`, have the
+model write a short comment for each student based on their score, and save the
+result to a new file. Combines JSON, list-of-dicts, functions, API calls and error
+handling in one program, and produces a genuine portfolio piece.
 
 ---
 
@@ -80,6 +95,8 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 18. **The ignored parameter, again.** `find_repo_with_most_stars(data)` looped over the global `repos` instead of `data`. Passing an empty list still returned a repo name — that was the proof. This is bug #6 recurring. **Checklist: after writing a function, confirm every declared parameter is actually used in the body.**
 19. `if repo["stargazers_count"] > 100:` → a made-up threshold standing in for "the most". Same as bug #4. There is no number to invent; compare the items against each other.
 20. Code after the `try`/`except` assumed the `try` had succeeded → `NameError: name 'repos' is not defined`. **Failure does not stop the file.** Any variable created inside `try` may not exist afterwards; success-path code belongs in `else:`.
+21. **An API key was pasted into a chat.** It was revoked within minutes and never reached a file or the git history (verified with `grep` and `git log -S`). **Rule: a key that leaves your machine is burned — revoke first, ask questions later.** Revoking is free and instant, so never hesitate.
+22. **Open item, not yet fixed:** `ask()` returns `None` when the request fails, because the `except` branch has no `return`. A caller doing `ask("...").upper()` would crash. Decide deliberately what a failed call should return — and make callers check.
 
 ---
 
@@ -100,16 +117,19 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 - [x] Virtual environments — the project's private Python in `.venv`
 - [x] `try` / `except` / `else` — specific exceptions, timeouts, testing failure branches
 - [ ] Installing libraries with `pip` and virtual environments
-- [ ] Git and GitHub — versions, not `Stats.py` v7  ← **next**
+- [x] Git and GitHub — `init`, `.gitignore`, `status`, `diff`, `add`, `commit`, `push`
+- [x] Ignore rules — `.venv/`, `__pycache__/`, `.idea/`, `.DS_Store`, `*.pyc`
 - [ ] **Project:** a script that solves one real problem
 
 ### Phase 2 — APIs & automation (weeks 5–8)
 - [x] JSON — reading and writing structured data (`json.load`, navigating nested dicts)
 - [x] `json.loads` — the string version, via `response.json()` on API responses
 - [x] HTTP requests — `requests.get()`, status codes, parsing the body
-- [ ] Calling an LLM API
-- [ ] Environment variables — keeping `SECRET_KEY` out of the code
-- [ ] Prompt design and function calling
+- [x] Calling an LLM API — Groq, `POST`, Bearer auth, reading the reply
+- [x] Environment variables — `.env` + `python-dotenv`, and a committed `.env.example`
+- [x] Revoking an exposed key, and verifying it never reached the repo
+- [ ] Prompt design — system messages, temperature, and writing prompts that work
+- [ ] **Project:** student-comment generator  ← **next**
 - [ ] n8n or Make — the low-code automation tools most client work uses
 - [ ] Webhooks — letting other apps trigger your code
 - [ ] **Project:** 3 portfolio automations, each with a written one-pager
