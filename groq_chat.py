@@ -12,12 +12,14 @@ headers = {
     "Content-Type": "application/json",
 }
 
-def ask(prompt):
+def ask(prompt, max_tokens=90):
     body = {
-        "model": "allam-2-7b",
+        "model": "qwen/qwen3.8-27b",
         "messages": [
             {"role": "user", "content": prompt}
         ],
+        "temperature": 0.3,
+        "max_tokens": max_tokens,
     }
 
     try:
@@ -26,14 +28,15 @@ def ask(prompt):
         data = response.json()
     except requests.exceptions.HTTPError as e:
         print("Groq returned an error:", e)
-        print(response.text)          # ← the real reason is in here
+        print(response.text)
+        return None
     else:
         return data["choices"][0]["message"]["content"]
 
 
-print(ask("What is a Python dictionary?"))
-print(ask("Give me one tip for beginner weight training."))
+if __name__ == "__main__":
+    print(ask("What is a Python dictionary?"))
+    print(ask("Give me one tip for beginner weight training."))
 
-
-models = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=30).json()
-print([m["id"] for m in models["data"]])
+    models = requests.get("https://api.groq.com/openai/v1/models", headers=headers, timeout=30).json()
+    print([m["id"] for m in models["data"]])

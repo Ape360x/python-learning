@@ -1,9 +1,9 @@
 {
   "status": "success",
   "students": [
-    {"name": "Ada", "score": 78},
-    {"name": "Bola", "score": 91},
-    {"name": "Chidi", "score": 64},
-    {"name": "Dayo", "score": 88}
+    {"name": "Ada", "score": 78, "subject":"Mathematics"},
+    {"name": "Bola", "score": 91, "subject":"Mathematics"},
+    {"name": "Chidi", "score": 64, "subject":"Mathematics"},
+    {"name": "Dayo", "score": 88, "subject":"Mathematics"}
   ]
 }
