@@ -94,6 +94,13 @@ function two or three fake dicts and run it — that caught the bug below in sec
   it across nodes and workflows
 - give a sandboxed tool one narrow exception — `N8N_RESTRICT_FILE_ACCESS_TO` instead of
   disabling the file guard outright
+- **export a workflow to `.json` and version it in git** — the work done by clicking is
+  still a file, and a file that isn't in the repo doesn't exist for a client
+- read that export for what it does *not* contain: the credential appears as a
+  reference (`{"id": ..., "name": ...}`), never the key, so a workflow can be shared
+  without handing over access
+- keep **the file name and the workflow's internal name** both descriptive — the
+  filename on disk and the name shown on import are two different fields
 
 **Done end to end:** `write_comments.py` reads `data.json`, asks the model for one
 report-card comment per student, and saves `comments.json` — JSON, list-of-dicts,
