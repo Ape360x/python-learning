@@ -74,6 +74,16 @@ function two or three fake dicts and run it — that caught the bug below in sec
 - generate **HTML** as a string with an f-string, and `html.escape()` every value
   that came from outside the program
 - write text with `encoding="utf-8"`, and use a format spec like `{average:.2f}`
+- keep the **success channel and the failure channel separate** — a function that
+  can fail should `raise`, not return a sentinel like `None` that callers must remember to check
+- wrap a low-level error in one of your own (`raise RuntimeError(...) from e`) so the
+  caller sees a contract it can act on, while the original cause stays in the traceback
+- catch a **parent exception** — `requests.exceptions.RequestException` covers
+  `HTTPError`, `ConnectionError` and `Timeout` in one clause
+- count successes and failures separately, `', '.join(failures)` them into a readable
+  line, and **refuse to write output when every call failed** instead of clobbering good data
+- reason about **exit codes** — `sys.exit(1)` when the job failed, `0` for success, so a
+  scheduler or pipeline can tell the difference between "ran" and "ran clean"
 
 **Done end to end:** `write_comments.py` reads `data.json`, asks the model for one
 report-card comment per student, and saves `comments.json` — JSON, list-of-dicts,
@@ -85,9 +95,13 @@ committed and pushed as a portfolio piece.
 writes one self-contained `report.html` a parent can open and print. Overall
 average 80.25, grades A–F, every inserted value passed through `html.escape()`.
 
-**Next session starts at:** the open bug #22 — decide what a failed `ask()` should
-return, and make its callers check, instead of silently getting `None`. Then Phase 2
-continues with n8n / Make, the low-code tools most client work runs on.
+**Also proven this session:** every request was made to fail on purpose (broken URL,
+then a genuinely unreachable network) and `comments.json` came out byte-identical —
+guarding a write is only believable if you check the file, not the printed message.
+
+**Next session starts at:** Phase 2 — n8n / Make, the low-code tools most client work
+runs on. `write_comments.py` is the reference: a job that reads its input, does real
+work, reports honestly, and exits non-zero when it fails.
 
 ---
 
@@ -116,7 +130,7 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 19. `if repo["stargazers_count"] > 100:` → a made-up threshold standing in for "the most". Same as bug #4. There is no number to invent; compare the items against each other.
 20. Code after the `try`/`except` assumed the `try` had succeeded → `NameError: name 'repos' is not defined`. **Failure does not stop the file.** Any variable created inside `try` may not exist afterwards; success-path code belongs in `else:`.
 21. **An API key was pasted into a chat.** It was revoked within minutes and never reached a file or the git history (verified with `grep` and `git log -S`). **Rule: a key that leaves your machine is burned — revoke first, ask questions later.** Revoking is free and instant, so never hesitate.
-22. **Open item, not yet fixed:** `ask()` returns `None` when the request fails, because the `except` branch has no `return`. A caller doing `ask("...").upper()` would crash. Decide deliberately what a failed call should return — and make callers check.
+22. **`ask()` reported failure by returning `None`** — the same channel it used for success, so every caller had to remember to check and a missed check meant a crash or an empty field three files later. **Fixed:** `ask()` now returns the text or **raises** `RuntimeError` (`except requests.exceptions.RequestException as e: raise RuntimeError(...) from e`), and `write_comments.py` decides what failure means — skip the student, count it, and refuse to write `comments.json` at all if nothing succeeded.
 
 ---
 

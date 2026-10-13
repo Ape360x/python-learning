@@ -26,10 +26,8 @@ def ask(prompt, max_tokens=90):
         response = requests.post(url, headers=headers, json=body, timeout=30)
         response.raise_for_status()
         data = response.json()
-    except requests.exceptions.HTTPError as e:
-        print("Groq returned an error:", e)
-        print(response.text)
-        return None
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Groq request failed: {e}") from e
     else:
         return data["choices"][0]["message"]["content"]
 

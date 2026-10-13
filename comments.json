@@ -2,25 +2,25 @@
   {
     "name": "Ada",
     "score": 78,
-    "comment": "The student scored 78 in Mathematics, showing solid effort but needing to practice multi-step word problems for greater accuracy.",
+    "comment": "The student achieved a solid 78, but should focus on strengthening algebraic manipulation to improve future performance.",
     "subject": "Mathematics"
   },
   {
     "name": "Bola",
     "score": 91,
-    "comment": "The student's 91 reflects strong performance, though they should focus on reducing calculation errors in multi-step problems.",
+    "comment": "The student achieved a strong 91, but should focus on reducing calculation errors in multi-step algebra problems.",
     "subject": "Mathematics"
   },
   {
     "name": "Chidi",
     "score": 64,
-    "comment": "The student's score of 64 indicates room for improvement, so they should focus on mastering basic algebraic equations.",
+    "comment": "The student scored 64 in Mathematics and should focus on improving their algebraic equation solving skills.",
     "subject": "Mathematics"
   },
   {
     "name": "Dayo",
     "score": 88,
-    "comment": "The student achieved a solid 88, but should focus on improving speed in solving multi-step algebraic equations to reach higher proficiency.",
+    "comment": "The student demonstrated strong mathematical skills, but should focus on reducing calculation errors to reach full mastery.",
     "subject": "Mathematics"
   }
 ]
