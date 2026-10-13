@@ -14,7 +14,7 @@
 
 ---
 
-## Where we are — 2026-10-10 (session 4)
+## Where we are — 2026-10-13 (session 5)
 
 The learner can, unaided:
 - write loops, conditionals and lists
@@ -63,11 +63,31 @@ function two or three fake dicts and run it — that caught the bug below in sec
   JSON body, and reading the reply from `data["choices"][0]["message"]["content"]`
 - read and write **list comprehensions** — `[m["id"] for m in data]`
 - wrap an API call in a reusable **`ask(prompt)`** function that returns the text
+- design a **prompt** that behaves: `temperature` for consistency, third-person
+  wording to stop the model using a name you never gave it, and `max_tokens=90`
+  to stay under Groq's per-minute output-token limit
+- loop a prompt over every student in `data.json` and collect the replies
+- write **structured output** — `json.dump(results, f, indent=2)` to `comments.json`
+- build a **lookup dict** from a list (`comments_by_name[row["name"]] = ...`) and
+  merge two files **by key, never by position**
+- return from a chain of `if`s — the first match wins, so the order of the tests matters
+- generate **HTML** as a string with an f-string, and `html.escape()` every value
+  that came from outside the program
+- write text with `encoding="utf-8"`, and use a format spec like `{average:.2f}`
 
-**Next session starts at:** the first real automation — read `data.json`, have the
-model write a short comment for each student based on their score, and save the
-result to a new file. Combines JSON, list-of-dicts, functions, API calls and error
-handling in one program, and produces a genuine portfolio piece.
+**Done end to end:** `write_comments.py` reads `data.json`, asks the model for one
+report-card comment per student, and saves `comments.json` — JSON, list-of-dicts,
+functions, an LLM API call, `try`/`except`, and rate-limit handling in one program,
+committed and pushed as a portfolio piece.
+
+**Done end to end:** `build_report.py` reads `data.json` (roster) and
+`comments.json` (comments), merges them **by name** through a lookup dict, and
+writes one self-contained `report.html` a parent can open and print. Overall
+average 80.25, grades A–F, every inserted value passed through `html.escape()`.
+
+**Next session starts at:** the open bug #22 — decide what a failed `ask()` should
+return, and make its callers check, instead of silently getting `None`. Then Phase 2
+continues with n8n / Make, the low-code tools most client work runs on.
 
 ---
 
@@ -119,7 +139,7 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 - [ ] Installing libraries with `pip` and virtual environments
 - [x] Git and GitHub — `init`, `.gitignore`, `status`, `diff`, `add`, `commit`, `push`
 - [x] Ignore rules — `.venv/`, `__pycache__/`, `.idea/`, `.DS_Store`, `*.pyc`
-- [ ] **Project:** a script that solves one real problem
+- [x] **Project:** a script that solves one real problem
 
 ### Phase 2 — APIs & automation (weeks 5–8)
 - [x] JSON — reading and writing structured data (`json.load`, navigating nested dicts)
@@ -128,8 +148,9 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 - [x] Calling an LLM API — Groq, `POST`, Bearer auth, reading the reply
 - [x] Environment variables — `.env` + `python-dotenv`, and a committed `.env.example`
 - [x] Revoking an exposed key, and verifying it never reached the repo
-- [ ] Prompt design — system messages, temperature, and writing prompts that work
-- [ ] **Project:** student-comment generator  ← **next**
+- [x] Prompt design — system messages, temperature, and writing prompts that work
+- [x] **Project:** student-comment generator
+- [x] **Project:** parent-facing `report.html` — merge two JSON files by name, build escaped HTML, write utf-8
 - [ ] n8n or Make — the low-code automation tools most client work uses
 - [ ] Webhooks — letting other apps trigger your code
 - [ ] **Project:** 3 portfolio automations, each with a written one-pager
