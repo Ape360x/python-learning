@@ -1,0 +1,248 @@
+{
+  "name": "Student Comments",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -32
+      ],
+      "id": "4a12d38a-9679-4773-905f-5eb02cc3b981",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/Users/admin/PycharmProjects/LockIn Gng/data.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        112
+      ],
+      "id": "32fec7de-d9aa-421f-a856-11dd1b35bddb",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        -240
+      ],
+      "id": "ed474ea5-6dee-4e71-a411-76b5e32bcbd9",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.students",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -256
+      ],
+      "id": "0360c654-95fe-4fbe-ba22-b0dfc502034f",
+      "name": "Split Out",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"qwen/qwen3.8-27b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"You are a teacher writing a short comment for a student's report card.\\n\\nScore: {{ $json.score }} out of 100\\nSubject: {{ $json.subject }}\\n\\nWrite exactly one sentence, no more than 25 words. Acknowledge the result honestly and suggest one specific thing to work on. Write about 'the student' in the third person. Return only the sentence - no preamble, no quotation marks.\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"max_tokens\": 90\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        368,
+        0
+      ],
+      "id": "43d162b4-daff-4a19-8805-1b4ccf4a4aa4",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "PSTJqoXvwCWQBDJK",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6c1d8a3-ff95-4b49-8b1f-7d243dbeef23",
+              "name": "name",
+              "value": "={{ $('Split Out').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "db7709bb-b4d3-4b43-b77f-784a85478bd1",
+              "name": "score",
+              "value": "={{ $('Split Out').item.json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "efaef789-2438-47cf-aec7-a03d49b2ad34",
+              "name": "subject",
+              "value": "={{ $('Split Out').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "b570c028-7a49-48cc-82f4-7d7e3e2f0361",
+              "name": "comment",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        0
+      ],
+      "id": "578a5549-a061-4715-afb6-60a9f74cb956",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        0
+      ],
+      "id": "7cb55be6-cfe3-4640-8653-a63ecd40e748",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/Users/admin/PycharmProjects/LockIn Gng/comments_n8n.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "1aba5ff5-a85b-41c5-8838-221ea7d95d78",
+      "name": "Read/Write Files from Disk1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "22b6cb29-ebd5-4985-af6d-60be9893c6aa",
+  "meta": {
+    "instanceId": "659892e6bf48d22535b1711ccc607475515f0c3103e31adb92515458e736e570"
+  },
+  "nodeGroups": [],
+  "id": "vrNIg7dMJynVx2xb",
+  "tags": []
+}

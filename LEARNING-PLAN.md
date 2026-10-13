@@ -14,7 +14,7 @@
 
 ---
 
-## Where we are — 2026-10-13 (session 5)
+## Where we are — 2026-10-13 (session 6)
 
 The learner can, unaided:
 - write loops, conditionals and lists
@@ -84,6 +84,16 @@ function two or three fake dicts and run it — that caught the bug below in sec
   line, and **refuse to write output when every call failed** instead of clobbering good data
 - reason about **exit codes** — `sys.exit(1)` when the job failed, `0` for success, so a
   scheduler or pipeline can tell the difference between "ran" and "ran clean"
+- run **n8n** locally and build a workflow out of nodes: trigger → read file → extract
+  JSON → split one list into many items → HTTP request → shape fields → write file
+- read the **item model** — nodes pass a list, and every later node runs once per item,
+  so `Split Out` replaces an explicit `for` loop
+- write **expressions** (`{{ $json.score }}`) and reach back to an earlier node with
+  `$('Split Out').item` when the response drops the fields you still need
+- store a secret in a **credential** (Header Auth) instead of a `.env` file, and reuse
+  it across nodes and workflows
+- give a sandboxed tool one narrow exception — `N8N_RESTRICT_FILE_ACCESS_TO` instead of
+  disabling the file guard outright
 
 **Done end to end:** `write_comments.py` reads `data.json`, asks the model for one
 report-card comment per student, and saves `comments.json` — JSON, list-of-dicts,
@@ -99,9 +109,12 @@ average 80.25, grades A–F, every inserted value passed through `html.escape()`
 then a genuinely unreachable network) and `comments.json` came out byte-identical —
 guarding a write is only believable if you check the file, not the printed message.
 
-**Next session starts at:** Phase 2 — n8n / Make, the low-code tools most client work
-runs on. `write_comments.py` is the reference: a job that reads its input, does real
-work, reports honestly, and exits non-zero when it fails.
+**Done end to end:** the comment generator, rebuilt as an n8n workflow — same job as
+`write_comments.py`, produced `comments_n8n.json` (4 rows, matching names and scores),
+with the Groq key moved from `.env` into a reusable credential.
+
+**Next session starts at:** Webhooks — letting something else trigger the workflow over
+HTTP instead of you clicking Execute, which is what turns a script into a service.
 
 ---
 
@@ -165,7 +178,8 @@ Worth re-reading — these are the classic beginner traps, already paid for:
 - [x] Prompt design — system messages, temperature, and writing prompts that work
 - [x] **Project:** student-comment generator
 - [x] **Project:** parent-facing `report.html` — merge two JSON files by name, build escaped HTML, write utf-8
-- [ ] n8n or Make — the low-code automation tools most client work uses
+- [x] n8n — triggers, nodes, the item model, expressions, credentials, file nodes
+- [x] **Project:** the comment generator rebuilt visually in n8n
 - [ ] Webhooks — letting other apps trigger your code
 - [ ] **Project:** 3 portfolio automations, each with a written one-pager
 
